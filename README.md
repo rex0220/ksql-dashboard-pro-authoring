@@ -103,8 +103,10 @@ git merge template/main --allow-unrelated-histories
 npm install
 ```
 
-- 自分の設定(`settings/` や `requirements/` に足したファイル)はそのまま残ります。
+- 自分の設定(`settings/` や `requirements/` に足したファイル)と `.env` はそのまま残ります。
   衝突が出るのは、テンプレート由来のファイル(docs/ や README)を自分で編集した場合だけです
+- テンプレート側は今後も `settings/` に README.md 以外、`requirements/` に example.md 以外の
+  ファイルを追加しません(あなたのファイルと衝突しないための約束です)
 - 最後の `npm install` は、テンプレートが kSQL エンジンの新バージョンを指すようになった
   場合の更新です(エンジンだけ上げたいときは `npm update @rex0220/kintone-sql-tools` でも可)
 
