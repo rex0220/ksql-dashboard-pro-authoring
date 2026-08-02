@@ -1,0 +1,226 @@
+{
+  "date": "2026-08-02 12:00:00",
+  "pluginName": "kSQL Dashboard Pro",
+  "pluginVersion": "1",
+  "engineVersion": "3.39.0",
+  "appId": 4149,
+  "appName": "案件管理",
+  "sqlApps": [
+    {
+      "appId": 4149,
+      "appName": "案件管理"
+    }
+  ],
+  "config": {
+    "schemaVersion": 2,
+    "edition": "pro",
+    "views": {},
+    "common": {
+      "theme": "light",
+      "csvExport": false,
+      "view": {
+        "name": "期間コントロール確認(K-6)",
+        "layout": [],
+        "panes": [],
+        "tabs": [
+          {
+            "id": "tab1",
+            "name": "プリセット",
+            "controls": [
+              {
+                "var": "period",
+                "type": "date",
+                "label": "対象期間",
+                "default": "thisMonth",
+                "presets": [
+                  "thisMonth",
+                  "lastMonth",
+                  "thisYear",
+                  "lastYear"
+                ]
+              }
+            ],
+            "panes": [
+              {
+                "id": "pane1",
+                "type": "kpi",
+                "title": "受注金額(期間内)",
+                "sql": "SELECT SUM(売上) AS メイン値, COUNT(*) AS 比較値\nFROM APP4149\nWHERE 商談フェーズ = '受注'\n  AND 受注予定日 = @period",
+                "options": {
+                  "goalBar": false,
+                  "format": {
+                    "prefix": "¥",
+                    "thousandSep": true,
+                    "decimals": 0
+                  },
+                  "description": "バーで選んだ期間(当月・前月・今年・去年など)が kintone の相対日付関数としてそのまま入ります(単一変数形)"
+                }
+              },
+              {
+                "id": "pane2",
+                "type": "kpi",
+                "title": "期間内に作成(日時フィールド)",
+                "sql": "SELECT COUNT(*) AS メイン値\nFROM APP4149\nWHERE 作成日時 = @period",
+                "options": {
+                  "description": "日時フィールドも単一変数形なら境界を kintone が正しく処理します(= THIS_MONTH() と同じ意味論)"
+                }
+              },
+              {
+                "id": "pane3",
+                "type": "kpi",
+                "title": "受注金額(全期間・対照)",
+                "sql": "SELECT SUM(売上) AS メイン値\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
+                "options": {
+                  "format": {
+                    "prefix": "¥",
+                    "thousandSep": true,
+                    "decimals": 0
+                  },
+                  "description": "変数を使わないペインは期間切り替えの影響を受けません(再実行もされません)"
+                }
+              },
+              {
+                "id": "pane4",
+                "type": "bar",
+                "title": "商談フェーズ別 件数(期間内)",
+                "sql": "SELECT 商談フェーズ, COUNT(*) AS 件数\nFROM APP4149\nWHERE 商談フェーズ <> ''\n  AND 受注予定日 = @period\nGROUP BY 商談フェーズ\nORDER BY 件数 DESC",
+                "options": {
+                  "legend": "none",
+                  "valueLabels": true,
+                  "xLabelsAll": true,
+                  "valueFormat": {
+                    "suffix": " 件"
+                  }
+                }
+              }
+            ],
+            "layout": [
+              {
+                "i": "pane1",
+                "x": 0,
+                "y": 0,
+                "w": 20,
+                "h": 3
+              },
+              {
+                "i": "pane2",
+                "x": 20,
+                "y": 0,
+                "w": 20,
+                "h": 3
+              },
+              {
+                "i": "pane3",
+                "x": 40,
+                "y": 0,
+                "w": 20,
+                "h": 3
+              },
+              {
+                "i": "pane4",
+                "x": 0,
+                "y": 3,
+                "w": 60,
+                "h": 6
+              }
+            ]
+          },
+          {
+            "id": "tab2",
+            "name": "期間指定",
+            "controls": [
+              {
+                "var": "range",
+                "type": "date",
+                "label": "期間",
+                "presets": [
+                  "custom"
+                ],
+                "customFrom": "today-1m",
+                "customTo": "thisMonthEnd"
+              }
+            ],
+            "panes": [
+              {
+                "id": "pane6",
+                "type": "kpi",
+                "title": "受注金額(指定期間)",
+                "sql": "SELECT SUM(売上) AS メイン値, COUNT(*) AS 比較値\nFROM APP4149\nWHERE 商談フェーズ = '受注'\n  AND 受注予定日 >= @range_from\n  AND 受注予定日 < @range_to_next",
+                "options": {
+                  "format": {
+                    "prefix": "¥",
+                    "thousandSep": true,
+                    "decimals": 0
+                  },
+                  "description": "範囲形(半開区間)で書いたペインです。期間指定(任意の開始〜終了)に追従します"
+                }
+              },
+              {
+                "id": "pane7",
+                "type": "table",
+                "title": "期間内の案件(範囲形)",
+                "sql": "SELECT $id, 案件名, 会社名, 商談フェーズ, 売上, 受注予定日\nFROM APP4149\nWHERE 受注予定日 >= @range_from\n  AND 受注予定日 < @range_to_next\nORDER BY 受注予定日",
+                "options": {
+                  "density": "compact",
+                  "rowNumbers": true,
+                  "columns": {
+                    "$id": {
+                      "hidden": true
+                    },
+                    "案件名": {
+                      "width": 240
+                    },
+                    "会社名": {
+                      "width": 200
+                    },
+                    "商談フェーズ": {
+                      "width": 100,
+                      "align": "center"
+                    },
+                    "売上": {
+                      "align": "right",
+                      "format": {
+                        "kind": "number",
+                        "prefix": "¥",
+                        "thousandSep": true,
+                        "decimals": 0
+                      }
+                    },
+                    "受注予定日": {
+                      "width": 110,
+                      "align": "center",
+                      "format": {
+                        "kind": "date",
+                        "pattern": "YYYY/MM/DD"
+                      }
+                    }
+                  },
+                  "totals": {
+                    "売上": "sum"
+                  },
+                  "description": "期間指定だけのタブの例です。このタブのペインは範囲形(>= @range_from AND < @range_to_next)で書き、プリセットのタブは単一変数形で書く — タブごとに SQL の書き方を揃えられます"
+                }
+              }
+            ],
+            "layout": [
+              {
+                "i": "pane6",
+                "x": 0,
+                "y": 0,
+                "w": 20,
+                "h": 3
+              },
+              {
+                "i": "pane7",
+                "x": 20,
+                "y": 0,
+                "w": 40,
+                "h": 6
+              }
+            ]
+          }
+        ]
+      }
+    }
+  }
+}

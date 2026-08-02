@@ -1,0 +1,214 @@
+{
+  "schemaVersion": 2,
+  "edition": "pro",
+  "views": {},
+  "common": {
+    "view": {
+      "name": "グラフ 8 種",
+      "layout": [],
+      "panes": [],
+      "tabs": [
+        {
+          "id": "tab1",
+          "name": "棒・複合",
+          "panes": [
+            {
+              "id": "pane1",
+              "type": "bar",
+              "title": "商談フェーズ別 件数",
+              "sql": "SELECT 商談フェーズ, COUNT(*) AS 件数\nFROM APP4149\nWHERE 商談フェーズ <> ''\nGROUP BY 商談フェーズ\nORDER BY 件数 DESC",
+              "options": {
+                "legend": "none",
+                "valueLabels": true,
+                "showTotal": true,
+                "xLabelsAll": true,
+                "valueFormat": {
+                  "suffix": " 件"
+                }
+              }
+            },
+            {
+              "id": "pane2",
+              "type": "barH",
+              "title": "業種別 売上(顧客管理と結合)",
+              "sql": "SELECT c.業種, SUM(d.売上) AS 売上\nFROM APP4149 d\nJOIN APP4148 c ON d.顧客No_ = c.顧客No\nGROUP BY c.業種\nORDER BY 売上 DESC",
+              "options": {
+                "legend": "none",
+                "valueLabels": true,
+                "showTotal": true,
+                "unitOnAxis": true,
+                "valueFormat": {
+                  "scale": "million",
+                  "decimals": 1,
+                  "hideScaleSuffix": true
+                }
+              }
+            },
+            {
+              "id": "pane3",
+              "type": "barStacked",
+              "title": "商談フェーズ × 提案商品 の売上",
+              "sql": "SELECT 商談フェーズ, 提案商品, SUM(売上) AS 売上\nFROM APP4149\nWHERE 商談フェーズ <> '' AND 提案商品 <> ''\nGROUP BY 商談フェーズ, 提案商品\nORDER BY 商談フェーズ",
+              "options": {
+                "legend": "bottom",
+                "valueFormat": {
+                  "scale": "man",
+                  "decimals": 0
+                }
+              }
+            },
+            {
+              "id": "pane4",
+              "type": "combo",
+              "title": "月次 売上と件数",
+              "sql": "SELECT DATE_FORMAT(受注予定日, '%Y-%m') AS 年月, SUM(売上) AS 売上, COUNT(*) AS 件数\nFROM APP4149\nWHERE 受注予定日 <> ''\nGROUP BY DATE_FORMAT(受注予定日, '%Y-%m')\nORDER BY 年月",
+              "options": {
+                "legend": "bottom",
+                "bars": [
+                  "売上"
+                ],
+                "lines": [
+                  "件数"
+                ],
+                "valueFormat": {
+                  "scale": "man",
+                  "decimals": 0
+                },
+                "valueFormatRight": {
+                  "suffix": " 件"
+                },
+                "refLines": [
+                  {
+                    "value": 10000000,
+                    "label": "月次目標"
+                  }
+                ]
+              }
+            }
+          ],
+          "layout": [
+            {
+              "i": "pane1",
+              "x": 0,
+              "y": 0,
+              "w": 30,
+              "h": 5
+            },
+            {
+              "i": "pane2",
+              "x": 30,
+              "y": 0,
+              "w": 30,
+              "h": 5
+            },
+            {
+              "i": "pane3",
+              "x": 0,
+              "y": 5,
+              "w": 30,
+              "h": 5
+            },
+            {
+              "i": "pane4",
+              "x": 30,
+              "y": 5,
+              "w": 30,
+              "h": 5
+            }
+          ]
+        },
+        {
+          "id": "tab2",
+          "name": "線・円",
+          "panes": [
+            {
+              "id": "pane5",
+              "type": "line",
+              "title": "月次 件数(フェーズ別・欠損あり)",
+              "sql": "SELECT DATE_FORMAT(受注予定日, '%Y-%m') AS 年月, 商談フェーズ, COUNT(*) AS 件数\nFROM APP4149\nWHERE 受注予定日 <> '' AND 商談フェーズ <> ''\nGROUP BY DATE_FORMAT(受注予定日, '%Y-%m'), 商談フェーズ\nORDER BY 年月",
+              "options": {
+                "legend": "bottom",
+                "gap": "break",
+                "valueFormat": {
+                  "suffix": " 件"
+                }
+              }
+            },
+            {
+              "id": "pane6",
+              "type": "area",
+              "title": "月次 売上(商品別・積み上げ)",
+              "sql": "SELECT DATE_FORMAT(受注予定日, '%Y-%m') AS 年月, 提案商品, SUM(売上) AS 売上\nFROM APP4149\nWHERE 受注予定日 <> '' AND 提案商品 <> ''\nGROUP BY DATE_FORMAT(受注予定日, '%Y-%m'), 提案商品\nORDER BY 年月",
+              "options": {
+                "legend": "bottom",
+                "gap": "zero",
+                "valueFormat": {
+                  "scale": "man",
+                  "decimals": 0
+                }
+              }
+            },
+            {
+              "id": "pane7",
+              "type": "pie",
+              "title": "業種別 案件数",
+              "sql": "SELECT c.業種, COUNT(*) AS 件数\nFROM APP4149 d\nJOIN APP4148 c ON d.顧客No_ = c.顧客No\nGROUP BY c.業種\nORDER BY 件数 DESC",
+              "options": {
+                "legend": "right",
+                "pieLabels": "percent",
+                "valueFormat": {
+                  "suffix": " 件"
+                }
+              }
+            },
+            {
+              "id": "pane8",
+              "type": "donut",
+              "title": "提案商品別 売上構成比",
+              "sql": "SELECT 提案商品, SUM(売上) AS 売上\nFROM APP4149\nWHERE 提案商品 <> ''\nGROUP BY 提案商品\nORDER BY 売上 DESC",
+              "options": {
+                "legend": "right",
+                "pieLabels": "both",
+                "showTotal": true,
+                "valueFormat": {
+                  "scale": "man",
+                  "decimals": 0
+                }
+              }
+            }
+          ],
+          "layout": [
+            {
+              "i": "pane5",
+              "x": 0,
+              "y": 0,
+              "w": 30,
+              "h": 5
+            },
+            {
+              "i": "pane6",
+              "x": 30,
+              "y": 0,
+              "w": 30,
+              "h": 5
+            },
+            {
+              "i": "pane7",
+              "x": 0,
+              "y": 5,
+              "w": 30,
+              "h": 5
+            },
+            {
+              "i": "pane8",
+              "x": 30,
+              "y": 5,
+              "w": 30,
+              "h": 5
+            }
+          ]
+        }
+      ]
+    }
+  }
+}

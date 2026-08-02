@@ -1,0 +1,92 @@
+{
+  "schemaVersion": 2,
+  "edition": "pro",
+  "views": {},
+  "common": {
+    "view": {
+      "name": "営業サマリー",
+      "layout": [
+        {
+          "i": "pane1",
+          "x": 0,
+          "y": 0,
+          "w": 14,
+          "h": 3
+        },
+        {
+          "i": "pane2",
+          "x": 14,
+          "y": 0,
+          "w": 26,
+          "h": 3
+        },
+        {
+          "i": "pane3",
+          "x": 40,
+          "y": 0,
+          "w": 20,
+          "h": 3
+        }
+      ],
+      "panes": [
+        {
+          "id": "pane1",
+          "type": "kpi",
+          "title": "受注金額(全社)",
+          "sql": "SELECT SUM(売上) AS メイン値,\n       50000000 AS 目標値\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
+          "options": {
+            "fontSize": "xlarge",
+            "goalBar": true,
+            "format": {
+              "prefix": "¥",
+              "thousandSep": true,
+              "decimals": 0
+            },
+            "rules": [
+              {
+                "target": "rate",
+                "op": ">=",
+                "value": 100,
+                "tone": "good",
+                "apply": "border"
+              },
+              {
+                "target": "rate",
+                "op": "<",
+                "value": 90,
+                "tone": "warn",
+                "apply": "border"
+              }
+            ]
+          }
+        },
+        {
+          "id": "pane2",
+          "type": "kpi",
+          "title": "商談フェーズ別 金額(全社)",
+          "sql": "SELECT 商談フェーズ AS タイトル,\n       SUM(売上)  AS メイン値\nFROM APP4149\nWHERE 商談フェーズ <> ''\nGROUP BY 商談フェーズ\nORDER BY メイン値 DESC",
+          "options": {
+            "multi": true,
+            "maxTiles": 6,
+            "format": {
+              "scale": "man",
+              "decimals": 0,
+              "thousandSep": true
+            }
+          }
+        },
+        {
+          "id": "pane3",
+          "type": "markdown",
+          "title": "今期サマリー(全社)",
+          "sql": "SELECT COUNT(*) AS 受注件数,\n       ROUND(SUM(売上) / 10000) AS 受注金額万\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
+          "options": {
+            "markdown": "- 受注 **{{受注件数}}** 件 / **{{受注金額万}}** 万円\n- **全社の数字です**(一覧の絞り込みとは連動しません)",
+            "fontSize": "normal"
+          }
+        }
+      ]
+    }
+  },
+  "deployOnSave": true
+}

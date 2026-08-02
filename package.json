@@ -1,0 +1,11 @@
+{
+  "name": "ksql-dashboard-pro-authoring",
+  "private": true,
+  "description": "kSQL Dashboard Pro の設定 JSON を AI(Claude Code + kSQL MCP)で作成・管理するテンプレート",
+  "engines": {
+    "node": ">=20"
+  },
+  "dependencies": {
+    "@rex0220/kintone-sql-tools": "^3.39.0"
+  }
+}

@@ -1,0 +1,149 @@
+{
+  "schemaVersion": 2,
+  "edition": "pro",
+  "views": {},
+  "common": {
+    "view": {
+      "name": "全社分析",
+      "layout": [
+        {
+          "i": "pane1",
+          "x": 0,
+          "y": 0,
+          "w": 30,
+          "h": 4
+        },
+        {
+          "i": "pane2",
+          "x": 30,
+          "y": 0,
+          "w": 30,
+          "h": 4
+        },
+        {
+          "i": "pane3",
+          "x": 0,
+          "y": 4,
+          "w": 60,
+          "h": 4
+        }
+      ],
+      "panes": [
+        {
+          "id": "pane1",
+          "type": "table",
+          "title": "会社別 売上ランキング",
+          "sql": "WITH 集計 AS (\n  SELECT 会社名, COUNT(*) AS 件数, SUM(売上) AS 売上\n  FROM APP4149\n  GROUP BY 会社名\n),\n順位付き AS (\n  SELECT 会社名, 件数, 売上,\n         RANK() OVER (ORDER BY 売上 DESC) AS 順位\n  FROM 集計\n)\nSELECT 順位, 会社名, 件数, 売上\nFROM 順位付き\nWHERE 順位 <= 5\nORDER BY 順位",
+          "options": {
+            "density": "compact",
+            "columns": {
+              "順位": {
+                "width": 60,
+                "align": "right"
+              },
+              "会社名": {
+                "width": 260
+              },
+              "件数": {
+                "width": 70,
+                "align": "right"
+              },
+              "売上": {
+                "align": "right",
+                "format": {
+                  "kind": "number",
+                  "prefix": "¥",
+                  "thousandSep": true,
+                  "decimals": 0
+                }
+              }
+            },
+            "rules": [
+              {
+                "kind": "threshold",
+                "column": "順位",
+                "op": "=",
+                "value": 1,
+                "tone": "good",
+                "scope": "row"
+              }
+            ]
+          }
+        },
+        {
+          "id": "pane2",
+          "type": "table",
+          "title": "フェーズ別 上位 3 社",
+          "sql": "WITH 集計 AS (\n  SELECT 商談フェーズ, 会社名, SUM(売上) AS 売上\n  FROM APP4149\n  WHERE 商談フェーズ <> ''\n  GROUP BY 商談フェーズ, 会社名\n),\n順位付き AS (\n  SELECT 商談フェーズ, 会社名, 売上,\n         RANK() OVER (PARTITION BY 商談フェーズ ORDER BY 売上 DESC) AS 順位\n  FROM 集計\n)\nSELECT 商談フェーズ, 順位, 会社名, 売上\nFROM 順位付き\nWHERE 順位 <= 3\nORDER BY 商談フェーズ, 順位",
+          "options": {
+            "density": "compact",
+            "columns": {
+              "商談フェーズ": {
+                "width": 100,
+                "align": "center"
+              },
+              "順位": {
+                "width": 60,
+                "align": "right"
+              },
+              "会社名": {
+                "width": 260
+              },
+              "売上": {
+                "align": "right",
+                "format": {
+                  "kind": "number",
+                  "prefix": "¥",
+                  "thousandSep": true,
+                  "decimals": 0
+                }
+              }
+            },
+            "rules": [
+              {
+                "kind": "threshold",
+                "column": "順位",
+                "op": "=",
+                "value": 1,
+                "tone": "good",
+                "scope": "row"
+              }
+            ]
+          }
+        },
+        {
+          "id": "pane3",
+          "type": "table",
+          "title": "案件ごとの活動量(活動履歴と結合)",
+          "sql": "SELECT d.案件名, d.商談フェーズ, d.売上,\n       COUNT(*) AS 活動件数\nFROM APP4147 a\nJOIN APP4149 d ON a.案件No = d.案件No_\nGROUP BY d.案件名, d.商談フェーズ, d.売上\nORDER BY 活動件数 DESC\nLIMIT 10",
+          "options": {
+            "density": "compact",
+            "columns": {
+              "案件名": {
+                "width": 320
+              },
+              "商談フェーズ": {
+                "width": 100,
+                "align": "center"
+              },
+              "売上": {
+                "align": "right",
+                "format": {
+                  "kind": "number",
+                  "prefix": "¥",
+                  "thousandSep": true,
+                  "decimals": 0
+                }
+              },
+              "活動件数": {
+                "width": 90,
+                "align": "right"
+              }
+            }
+          }
+        }
+      ]
+    }
+  },
+  "deployOnSave": true
+}

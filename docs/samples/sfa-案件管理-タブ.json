@@ -1,0 +1,351 @@
+{
+  "schemaVersion": 2,
+  "edition": "pro",
+  "views": {},
+  "common": {
+    "view": {
+      "name": "営業ダッシュボード",
+      "layout": [],
+      "panes": [],
+      "tabs": [
+        {
+          "id": "tab1",
+          "name": "サマリー",
+          "panes": [
+            {
+              "id": "pane1",
+              "type": "kpi",
+              "title": "受注金額",
+              "sql": "SELECT SUM(売上) AS メイン値,\n       50000000 AS 目標値\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
+              "options": {
+                "fontSize": "xlarge",
+                "goalBar": true,
+                "format": {
+                  "prefix": "¥",
+                  "thousandSep": true,
+                  "decimals": 0
+                },
+                "rules": [
+                  {
+                    "target": "rate",
+                    "op": ">=",
+                    "value": 100,
+                    "tone": "good",
+                    "apply": "border"
+                  },
+                  {
+                    "target": "rate",
+                    "op": "<",
+                    "value": 90,
+                    "tone": "warn",
+                    "apply": "border"
+                  }
+                ]
+              }
+            },
+            {
+              "id": "pane2",
+              "type": "kpi",
+              "title": "商談フェーズ別 金額",
+              "sql": "SELECT 商談フェーズ AS タイトル,\n       SUM(売上)  AS メイン値\nFROM APP4149\nWHERE 商談フェーズ <> ''\nGROUP BY 商談フェーズ\nORDER BY メイン値 DESC",
+              "options": {
+                "multi": true,
+                "maxTiles": 6,
+                "format": {
+                  "scale": "man",
+                  "decimals": 0,
+                  "thousandSep": true
+                }
+              }
+            },
+            {
+              "id": "pane3",
+              "type": "markdown",
+              "title": "サマリー",
+              "sql": "SELECT COUNT(*) AS 受注件数,\n       ROUND(SUM(売上) / 10000) AS 受注金額万\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
+              "options": {
+                "markdown": "### 今期サマリー\n\n- 受注 **{{受注件数}}** 件 / **{{受注金額万}}** 万円\n- 目標 5,000 万円に対する進捗は左の KPI カードを参照\n- <span style=\"color:#c0392b\">金額は税抜・受注フェーズのみ集計</span>",
+                "fontSize": "normal"
+              }
+            }
+          ],
+          "layout": [
+            {
+              "i": "pane1",
+              "x": 0,
+              "y": 0,
+              "w": 14,
+              "h": 3
+            },
+            {
+              "i": "pane2",
+              "x": 14,
+              "y": 0,
+              "w": 26,
+              "h": 3
+            },
+            {
+              "i": "pane3",
+              "x": 40,
+              "y": 0,
+              "w": 20,
+              "h": 3
+            }
+          ]
+        },
+        {
+          "id": "tab2",
+          "name": "グラフ",
+          "panes": [
+            {
+              "id": "pane4",
+              "type": "bar",
+              "title": "商談フェーズ別 件数",
+              "sql": "SELECT 商談フェーズ,\n       COUNT(*) AS 件数\nFROM APP4149\nWHERE 商談フェーズ <> ''\nGROUP BY 商談フェーズ\nORDER BY 件数 DESC",
+              "options": {
+                "legend": "none",
+                "mapping": {
+                  "x": "商談フェーズ",
+                  "valueColumns": [
+                    "件数"
+                  ]
+                }
+              }
+            },
+            {
+              "id": "pane5",
+              "type": "donut",
+              "title": "提案商品別 売上構成比",
+              "sql": "SELECT 提案商品,\n       SUM(売上) AS 売上\nFROM APP4149\nWHERE 提案商品 <> ''\nGROUP BY 提案商品\nORDER BY 売上 DESC",
+              "options": {
+                "legend": "right",
+                "topN": 8,
+                "mapping": {
+                  "x": "提案商品",
+                  "value": "売上"
+                },
+                "valueFormat": {
+                  "scale": "man",
+                  "decimals": 0,
+                  "thousandSep": true
+                }
+              }
+            },
+            {
+              "id": "pane6",
+              "type": "combo",
+              "title": "月次 売上と件数",
+              "sql": "SELECT DATE_FORMAT(受注予定日, '%Y-%m') AS 年月,\n       SUM(売上) AS 売上,\n       COUNT(*)  AS 件数\nFROM APP4149\nWHERE 受注予定日 <> ''\nGROUP BY DATE_FORMAT(受注予定日, '%Y-%m')\nORDER BY 年月",
+              "options": {
+                "legend": "top",
+                "mapping": {
+                  "x": "年月"
+                },
+                "bars": [
+                  "売上"
+                ],
+                "lines": [
+                  "件数"
+                ],
+                "valueFormat": {
+                  "scale": "man",
+                  "decimals": 0,
+                  "thousandSep": true
+                }
+              }
+            }
+          ],
+          "layout": [
+            {
+              "i": "pane4",
+              "x": 0,
+              "y": 0,
+              "w": 20,
+              "h": 5
+            },
+            {
+              "i": "pane5",
+              "x": 20,
+              "y": 0,
+              "w": 20,
+              "h": 5
+            },
+            {
+              "i": "pane6",
+              "x": 40,
+              "y": 0,
+              "w": 20,
+              "h": 5
+            }
+          ]
+        },
+        {
+          "id": "tab3",
+          "name": "集計",
+          "panes": [
+            {
+              "id": "pane7",
+              "type": "barH",
+              "title": "業種別 売上(顧客管理と結合)",
+              "sql": "SELECT c.業種,\n       SUM(d.売上) AS 売上\nFROM APP4149 d\nJOIN APP4148 c ON d.顧客No_ = c.顧客No\nGROUP BY c.業種\nORDER BY 売上 DESC",
+              "options": {
+                "legend": "none",
+                "mapping": {
+                  "x": "業種",
+                  "valueColumns": [
+                    "売上"
+                  ]
+                },
+                "valueFormat": {
+                  "scale": "man",
+                  "decimals": 0,
+                  "thousandSep": true
+                }
+              }
+            },
+            {
+              "id": "pane8",
+              "type": "table",
+              "title": "顧客ランク別 実績(顧客管理と結合)",
+              "sql": "SELECT c.顧客ランク AS ランク,\n       COUNT(*)     AS 件数,\n       SUM(d.売上)  AS 売上\nFROM APP4149 d\nJOIN APP4148 c ON d.顧客No_ = c.顧客No\nGROUP BY c.顧客ランク\nORDER BY c.顧客ランク",
+              "options": {
+                "density": "compact",
+                "columns": {
+                  "ランク": {
+                    "width": 80,
+                    "align": "center"
+                  },
+                  "件数": {
+                    "width": 90,
+                    "align": "right"
+                  },
+                  "売上": {
+                    "align": "right",
+                    "format": {
+                      "kind": "number",
+                      "prefix": "¥",
+                      "thousandSep": true,
+                      "decimals": 0
+                    }
+                  }
+                },
+                "totals": {
+                  "件数": "sum",
+                  "売上": "sum"
+                },
+                "rules": [
+                  {
+                    "kind": "heatmap",
+                    "column": "売上"
+                  }
+                ]
+              }
+            }
+          ],
+          "layout": [
+            {
+              "i": "pane7",
+              "x": 0,
+              "y": 0,
+              "w": 30,
+              "h": 5
+            },
+            {
+              "i": "pane8",
+              "x": 30,
+              "y": 0,
+              "w": 30,
+              "h": 5
+            }
+          ]
+        },
+        {
+          "id": "tab4",
+          "name": "明細",
+          "panes": [
+            {
+              "id": "pane9",
+              "type": "table",
+              "title": "案件明細(金額順)",
+              "sql": "SELECT $id, 案件名, 会社名, 商談フェーズ, 確度, 売上, 受注予定日\nFROM APP4149\nWHERE 商談フェーズ <> ''\nORDER BY 売上 DESC\nLIMIT 100",
+              "options": {
+                "density": "compact",
+                "columns": {
+                  "$id": {
+                    "hidden": true
+                  },
+                  "案件名": {
+                    "width": 300
+                  },
+                  "会社名": {
+                    "width": 240
+                  },
+                  "商談フェーズ": {
+                    "width": 110,
+                    "align": "center"
+                  },
+                  "確度": {
+                    "width": 80,
+                    "align": "center"
+                  },
+                  "売上": {
+                    "align": "right",
+                    "format": {
+                      "kind": "number",
+                      "prefix": "¥",
+                      "thousandSep": true,
+                      "decimals": 0
+                    }
+                  },
+                  "受注予定日": {
+                    "width": 120,
+                    "align": "center",
+                    "format": {
+                      "kind": "date",
+                      "pattern": "YYYY/MM/DD"
+                    }
+                  }
+                },
+                "totals": {
+                  "売上": "sum"
+                },
+                "rules": [
+                  {
+                    "kind": "threshold",
+                    "column": "売上",
+                    "op": ">=",
+                    "value": 6000000,
+                    "tone": "good"
+                  },
+                  {
+                    "kind": "threshold",
+                    "column": "商談フェーズ",
+                    "op": "=",
+                    "value": "内示",
+                    "tone": "warn",
+                    "scope": "row"
+                  }
+                ],
+                "initialSort": [
+                  {
+                    "column": "売上",
+                    "desc": true
+                  }
+                ]
+              }
+            }
+          ],
+          "layout": [
+            {
+              "i": "pane9",
+              "x": 0,
+              "y": 0,
+              "w": 60,
+              "h": 6
+            }
+          ]
+        }
+      ]
+    }
+  }
+}
