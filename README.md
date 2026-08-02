@@ -66,7 +66,10 @@ AI(Claude Code + kSQL MCP)に作らせる**ためのテンプレートです。
    対象アプリが確定している運用向けです。
    </details>
 4. **VSCode で開いて Claude Code を起動** — 初回に kSQL MCP サーバーの使用可否を
-   聞かれるので許可します(登録内容は `.mcp.json`)
+   聞かれるので許可します(登録内容は `.mcp.json`)。
+   以後の作業では、kintone の**読み取り**と `settings/` / `requirements/` への
+   **ファイル保存**は確認なしで進みます(同梱の `.claude/settings.json` で許可済み。
+   逆に kintone への書き込みツールは同ファイルで**拒否**しています)
 5. **疎通確認** — Claude Code に頼みます:
    ```
    ksql_show_apps を実行して
@@ -137,7 +140,7 @@ npm install
 
 - このテンプレートは kintone を**読み取り専用**で使います。書き込みは 3 層で防いでいます:
   ① [CLAUDE.md](CLAUDE.md) で書き込みツールの使用を禁止
-  ② Claude Code のツール許可プロンプト(書き込みツールは利用者が明示的に許可しない限り動きません)
+  ② `.claude/settings.json` で書き込みツール(`ksql_mutate`)を**拒否設定**
   ③ kSQL MCP 側の DML 承認ゲート(書き込みには明示の承認パラメーターが必要)
 - サーバー側から完全に担保したい場合は、閲覧権限だけの専用アカウント、
   または「閲覧」のみの API トークン認証(ステップ 3 の代替)を使ってください

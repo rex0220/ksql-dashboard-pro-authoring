@@ -1,0 +1,26 @@
+{
+  "permissions": {
+    "allow": [
+      "mcp__ksql__ksql_show_apps",
+      "mcp__ksql__ksql_describe_app",
+      "mcp__ksql__ksql_app_metadata",
+      "mcp__ksql__ksql_docs",
+      "mcp__ksql__ksql_validate",
+      "mcp__ksql__ksql_explain",
+      "mcp__ksql__ksql_query",
+      "mcp__ksql__ksql_list_queries",
+      "mcp__ksql__ksql_get_query",
+      "mcp__ksql__ksql_save_query",
+      "mcp__ksql__ksql_run_saved_query",
+      "Write(settings/**)",
+      "Write(requirements/**)",
+      "Write(temp/**)",
+      "Edit(settings/**)",
+      "Edit(requirements/**)",
+      "Edit(temp/**)"
+    ],
+    "deny": [
+      "mcp__ksql__ksql_mutate"
+    ]
+  }
+}
