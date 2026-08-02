@@ -28,9 +28,10 @@ AI(Claude Code + kSQL MCP)に作らせる**ためのテンプレートです。
 
 ## セットアップ(7 ステップ)
 
-1. **リポジトリを作る** — このページ右上の **Use this template** → 自分のアカウントに
-   **private** で作成 → clone
-   (設定 JSON にはアプリ番号・フィールド名・業務用語が入ります。**public にしないでください**)
+1. **リポジトリを作る** — このページ右上の **Use this template → Create a new repository** →
+   自分のアカウントに **private** で作成 → clone
+   (設定 JSON にはアプリ番号・フィールド名・業務用語が入ります。**public にしないでください**。
+   「Open in a codespace」はこの手順では使いません — ローカルの VSCode + Claude Code が前提です)
 2. **依存を入れる**
    ```
    npm install
