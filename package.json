@@ -1,5 +1,6 @@
 {
   "name": "ksql-dashboard-pro-authoring",
+  "version": "1.0.0",
   "private": true,
   "description": "kSQL Dashboard Pro の設定 JSON を AI(Claude Code + kSQL MCP)で作成・管理するテンプレート",
   "engines": {
