@@ -62,7 +62,13 @@ flowchart LR
      setx KSQL_USERNAME "<ログイン名>"
      setx KSQL_PASSWORD "<パスワード>"
      ```
-     を実行して **VSCode を再起動**します(「システムのプロパティ → 環境変数」画面でも可)
+     を実行して **VSCode のウィンドウをすべて閉じ、起動し直します**
+     (「システムのプロパティ → 環境変数」画面でも可)。
+     **「Reload Window」では反映されません。** ターミナルから `code` で起動している場合は
+     そのターミナルも開き直してください。反映確認は VSCode のターミナルで:
+     ```
+     node -e "console.log(process.env.KSQL_USERNAME ?? '(未設定)')"
+     ```
    - **簡易: `.env` に書く** — `KSQL_USERNAME` / `KSQL_PASSWORD` の 2 行を足すだけ。
      `.env` は .gitignore 済みですが、ファイルに平文で残る点は理解して使ってください
      (macOS / Linux は GUI 起動の VSCode に環境変数が渡りにくいため、こちらが現実的です)
@@ -156,6 +162,7 @@ npm install
 | 症状 | 確認すること |
 | :--- | :--- |
 | MCP サーバーが起動しない | Node.js 20 以上か(`node -v`)。`npm install` 済みか。`.env` を作ったか(無いと起動時エラーになります) |
+| `AuthError: token is not resolved` | 認証情報が MCP サーバーに届いていない。`.env` の `KSQL_USERNAME` / `KSQL_PASSWORD` が空のままか、OS 環境変数の設定後に **VSCode を完全再起動していない**(Reload Window では反映されません) |
 | 401 / 権限エラー | ログイン名・パスワードの誤り。**2 要素認証が有効なアカウントは使えません**。`KSQL_BASE_URL` のドメイン。トークン認証の場合は発行後に**アプリを更新**したか |
 | アプリが見えない・少ない | そのユーザー(またはトークン)にアプリの閲覧権限があるか |
 | インポートで「出力元の情報がありません」 | 生成された JSON が封筒形式でない。AI に「封筒形式で出力し直して」と伝える |
