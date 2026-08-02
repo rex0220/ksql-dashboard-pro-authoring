@@ -25,6 +25,7 @@ flowchart LR
 
 > プラグイン本体(kSQL Dashboard Pro)は別途入手してください。
 > 製品紹介: https://qiita.com/rex0220/items/9c7a5a2aea28198c438b
+> このテンプレートのハンズオン記事(画像付き): https://qiita.com/rex0220/items/978aa4d8fa66fb33ba72
 
 ## 前提
 
