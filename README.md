@@ -31,7 +31,13 @@ AI(Claude Code + kSQL MCP)に作らせる**ためのテンプレートです。
 1. **リポジトリを作る** — このページ右上の **Use this template → Create a new repository** →
    自分のアカウントに **private** で作成 → clone
    (設定 JSON にはアプリ番号・フィールド名・業務用語が入ります。**public にしないでください**。
+   作成画面の visibility は **Public が初期値**なので必ず Private に切り替えます。
    「Open in a codespace」はこの手順では使いません — ローカルの VSCode + Claude Code が前提です)
+
+   [GitHub CLI](https://cli.github.com/) があれば、1 行で private 作成 + clone まで済みます:
+   ```
+   gh repo create ksql-dashboards --template rex0220/ksql-dashboard-pro-authoring --private --clone
+   ```
 2. **依存を入れる**
    ```
    npm install
