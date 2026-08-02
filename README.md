@@ -6,15 +6,21 @@ AI(Claude Code + kSQL MCP)に作らせる**ためのテンプレートです。
 要件を文章で伝えると、AI が**実アプリのフィールド定義・実データを確認しながら** SQL を確定し、
 インポートできる設定 JSON を `settings/` に生成します。設定は git で履歴管理できます。
 
-```
-  ┌─ VSCode + Claude Code ────────────────────────────────┐
-  │   ① kSQL MCP ───────────► kintone(read-only)         │
-  │      実アプリのフィールド定義・実データで SQL を確定      │
-  │   ② docs/設定ファイル仕様 ─► 設定 JSON を組み立て        │
-  │   ③ git ────────────────► 差分レビュー・履歴管理        │
-  └───────────────────────────────────────────────────────┘
-                             ▼ ④ プラグイン設定の「インポート」→「保存」
-                        kintone アプリ
+```mermaid
+flowchart LR
+    subgraph work["VSCode + Claude Code"]
+        REQ["requirements/<br>要件(日本語で書く)"]
+        DOCS["docs/<br>設定ファイル仕様・レシピ集"]
+        AI["AI(Claude Code)"]
+        JSON["settings/<br>設定 JSON(封筒形式)"]
+        REQ --> AI
+        DOCS -- "② 仕様に沿って組み立て" --> AI
+        AI -- "③ 生成 → git で差分レビュー・履歴管理" --> JSON
+    end
+    KT[("kintone<br>read-only")]
+    APP["kintone アプリの<br>ダッシュボード"]
+    AI <-- "① kSQL MCP:実アプリのフィールド定義・<br>実データで SQL を確定" --> KT
+    JSON -- "④ プラグイン設定で<br>インポート → 保存" --> APP
 ```
 
 > プラグイン本体(kSQL Dashboard Pro)は別途入手してください。
