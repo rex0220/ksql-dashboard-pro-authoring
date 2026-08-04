@@ -249,9 +249,14 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
   → 構成比は CREATE TEMP TABLE → SET @total = (SELECT …) → 最後に SELECT で書く
   → 描画されるのは「最後に結果セットを返した文」
 - LAPP_<名前>(論理アプリ名)+ config.logicalApps — 配布・環境移行前提の設定はこちらで書く
-- 期間コントロール(view/タブの controls: type "date")— 閲覧者の期間切り替え。
-  ペイン SQL は WHERE 日付列 = @<変数>(kintone 関数が入る)、任意区間対応は
-  WHERE 日付列 >= @<変数>_from AND 日付列 < @<変数>_to_next(半開区間)。DECLARE は書かない
+- 変数コントロール(view/タブの controls)— 閲覧者が値を切り替えるバー。DECLARE は書かない
+  - type "date": WHERE 日付列 = @<変数>(kintone 関数が入る)、任意区間対応は
+    WHERE 日付列 >= @<変数>_from AND 日付列 < @<変数>_to_next(半開区間)
+  - type "string" / "number": 供給されるのは @<変数> 1 本だけ(範囲形は date のみ)。
+    options で固定リスト、optionsSql で動的リスト(1 列目 = 値 / 2 列目 = 表示名)
+  - KLIKE の右辺に空文字は渡せないので、string を KLIKE に使うなら default を必ず書く
+  - ユーザー選択フィールドの絞り込みには使わない(照合は code で、存在しない値は
+    0 件ではなく kintone API エラーになる)
 - VALIDATE APP<番号>(入力規則違反の洗い出し。データ品質ペイン)
 - ウィンドウ関数 ROW_NUMBER / RANK / DENSE_RANK(OVER(…) と AS 別名は必須)
 - 取得上限・一時テーブル上限は最大 50,000(既定 10,000。大きくするなら options.maxRecords /
