@@ -228,6 +228,10 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 4. docs/samples/sfa-案件管理-dashboard.json を雛形にしてよい
 
 制約:
+- SQL にはフィールドコードを書く。**コードとラベルが違う列は AS でラベルを付ける**
+  (例 `顧客No_ AS \`顧客No.\``)。記号・空白を含むラベルはバッククォートで囲む
+- 要件がラベルで書かれていたら、**どのコードへ対応させたかを先に示す**。似たラベルが
+  複数あるときは推測せず確認する
 - 出力は必ず封筒形式(date / pluginName / pluginVersion / engineVersion / appId / appName /
   sqlApps / config)。素の config だけで出力するのは誤り
 - ペインは最大 12 枚、layout[].i と panes[].id を 1:1 で両方書く
@@ -254,6 +258,10 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
     WHERE 日付列 >= @<変数>_from AND 日付列 < @<変数>_to_next(半開区間)
   - type "string" / "number": 供給されるのは @<変数> 1 本だけ(範囲形は date のみ)。
     options で固定リスト、optionsSql で動的リスト(1 列目 = 値 / 2 列目 = 表示名)
+  - optionsSql は WHERE がなければ対象アプリを全件読む(DISTINCT はエンジン側なので
+    取得は減らない)。マスタアプリから取るか、WHERE 作成日時 >= LAST_YEAR() で絞る
+  - 値と表示名が違う固定リストは、リテラルの UNION ALL で書く(FROM なし = 取得ゼロ)。
+    SELECT 'A' AS 値, 'Aプラン' AS 表示名 UNION ALL SELECT 'B', 'Bプラン'
   - KLIKE の右辺に空文字は渡せないので、string を KLIKE に使うなら default を必ず書く
   - ユーザー選択フィールドの絞り込みには使わない(照合は code で、存在しない値は
     0 件ではなく kintone API エラーになる)
