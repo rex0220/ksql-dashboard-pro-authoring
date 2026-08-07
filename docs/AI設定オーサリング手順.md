@@ -3,8 +3,8 @@
 **VSCode + Claude Code + kSQL MCP + 設定ファイル仕様**で、
 ダッシュボード設定を「実アプリのデータを見ながら AI が書き、git で管理する」ための手順。
 
-- 最終更新: 2026-08-04
-- 対応: kSQL エンジン **3.44 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
+- 最終更新: 2026-08-08
+- 対応: kSQL エンジン **3.61 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
 - **改訂履歴は git を参照**(`git log --follow docs/AI設定オーサリング手順.md`)
 - 関連: [設定ファイル仕様](./設定ファイル仕様.md)(フォーマットの正本)/
   [ダッシュボードレシピ集](./ダッシュボードレシピ集.md)(SQL の書き方)
@@ -241,11 +241,17 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 - SELECT 別名の英字は結果列名では小文字になる。columns / totals / mapping の参照は
   ksql_query が返した列名(小文字の側)をそのまま書く
 - ユーザー選択・複数選択フィールドには = ではなく in を使う
+  (ドロップダウン・ラジオボタン・ステータスは = / != でも自動で押し下がる。
+  ただし定義に無い値・空文字は押し下がらない)
 - 期間の絞り込みは相対日付。JOIN でも使えるが、LEFT/RIGHT JOIN・アプリをまたぐ OR・
   CTE を JOIN の入力にした形は不可
 - LEFT/RIGHT JOIN は取得上限に掛かりやすい。押し下げが効かず相手のアプリを丸ごと取るため、
   保持されない側が上限に達するとエラーになる。使うなら取得上限を候補集合より大きくする
-- ドロップダウン・ラジオボタンは = ではなく in を使う(= は押し下げされず全件取得になる)
+- 集計を含む SELECT に、集計もグループ化もしていない列を書かない(エラーになる。
+  MIN()/MAX() で包むか GROUP BY に足す。ANY_VALUE は無い)
+- UNION は両辺の列数を揃える(不一致はエラー。足りない側へ '' などを足す)
+- 値が 0 個のときの MIN/MAX は 0 ではなく空文字。0 件判定・除数ガードは = '' も見る
+- サブテーブルの中の項目は APPn$テーブル から選ぶ(親から SELECT すると全行が空になる)
 - SELECT * は使わず列を明示する(設定が列名を参照するため)
 
 使えるもの(積極的に使ってよい):
@@ -266,7 +272,13 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
   - ユーザー選択フィールドの絞り込みには使わない(照合は code で、存在しない値は
     0 件ではなく kintone API エラーになる)
 - VALIDATE APP<番号>(入力規則違反の洗い出し。データ品質ペイン)
-- ウィンドウ関数 ROW_NUMBER / RANK / DENSE_RANK(OVER(…) と AS 別名は必須)
+- GENERATE_SERIES(start, stop [, step]) — WITH の CTE 本体にだけ書ける整数・日付系列。
+  取引の無い日を 0 で並べる日次推移は、系列を左辺にした LEFT JOIN で書く(レシピ D20)。
+  日付 step は '1 day' 形式(day のみ)、生成上限 10,000 行、取得ゼロ
+- ウィンドウ関数 — 順位系(ROW_NUMBER / RANK / DENSE_RANK)・集計ウィンドウ
+  (SUM/COUNT/AVG/MIN/MAX … OVER。累積残高)・LAG / LEAD(前月比は月次集約 → LAG → 比率の 3 段)。
+  OVER(…) と AS 別名は必須。集計・GROUP BY と同じ SELECT には書けない(CTE で分ける)。
+  集計ウィンドウ・LAG/LEAD は取得上限に達すると打ち切りではなくエラー
 - 取得上限・一時テーブル上限は最大 50,000(既定 10,000。大きくするなら options.maxRecords /
   options.tempTableMaxRows)
 
@@ -294,7 +306,7 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 
 | 項目 | 内容 |
 | :--- | :--- |
-| MCP サーバー | `ksql-mcp` **3.44.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る |
+| MCP サーバー | `ksql-mcp` **3.61.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**(3.56.3〜)。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
 | ツール | 13 個 — `ksql_show_apps` / `ksql_describe_app` / `ksql_app_metadata` / `ksql_validate` / `ksql_explain` / `ksql_query` / `ksql_docs` / `ksql_mutate` / 保存クエリ 5 種 |
 | resources | `ksql://language-reference` / `ksql://recipes` |
 | 認証 | `KSQL_BASE_URL` +(`KSQL_TOKEN` または `KSQL_USERNAME`/`KSQL_PASSWORD`) |

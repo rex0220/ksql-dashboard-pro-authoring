@@ -41,7 +41,7 @@
      "date": "<生成日時 YYYY-MM-DD HH:MM:SS>",
      "pluginName": "kSQL Dashboard Pro",
      "pluginVersion": "1",
-     "engineVersion": "3.39.0",           // node_modules の @rex0220/kintone-sql-tools の version
+     "engineVersion": "3.61.0",           // node_modules の @rex0220/kintone-sql-tools の version
      "appId": <対象アプリ番号>,
      "appName": "<対象アプリ名>",
      "sqlApps": [                          // SQL が参照する APP<番号> をすべて列挙(名前は ksql_show_apps から)
@@ -71,7 +71,12 @@
   書いたとおりに出る)。`columns` / `totals` / `mapping` の参照は `ksql_query` が返した列名
   (小文字の側)をそのまま書く
 - ユーザー選択・作成者・更新者・チェックボックス・複数選択には `=` ではなく `in` / `not in`
-- ドロップダウン・ラジオボタンも `in` を使う(`=` は押し下げされず全件取得になる)
+  (ドロップダウン・ラジオボタン・ステータスは `=` / `!=` でも 3.47.0 から自動で押し下がる。
+  ただし定義に無い値・空文字は押し下がらない)
+- **集計を含む SELECT に、集計もグループ化もしていない列は書けない**(3.57.0〜エラー)。
+  `MIN()` / `MAX()` で包むか `GROUP BY` に足す(`ANY_VALUE()` は無い)
+- UNION は両辺の列数を揃える(3.50.0〜不一致はエラー。足りない側へ `''` などを足す)
+- 値が 0 個のときの `MIN` / `MAX` は `0` ではなく空文字(3.54.0〜)。0 件判定・除数ガードは `= ''` も見る
 - `SELECT *` は使わない(設定が列名を参照するため列を明示)
 - 期間の絞り込みは相対日付関数(THIS_MONTH() 等)。LEFT/RIGHT JOIN 内・アプリをまたぐ OR・
   CTE を JOIN の入力にした形では使えない
@@ -88,7 +93,14 @@
   `WHERE 日付列 >= @<変数>_from AND 日付列 < @<変数>_to_next`(半開区間)。`DECLARE` は書かない
 - UNION の枝の COUNT(*) はラベル列つきでも単発 GET — アプリ件数一覧に最適
 - VALIDATE APP<番号>(データ品質ペイン)
-- ウィンドウ関数 ROW_NUMBER / RANK / DENSE_RANK(`OVER(…)` と `AS 別名` は必須)
+- **`GENERATE_SERIES(start, stop [, step])`**(3.59.0〜)— WITH の CTE 本体にだけ書ける
+  整数・日付系列。取引の無い日を 0 で並べる日次推移は、系列を左辺にした LEFT JOIN で書く
+  (レシピ D20。日付 step は '1 day' 形式で day のみ・生成上限 10,000 行・取得ゼロ)
+- ウィンドウ関数 — 順位系(ROW_NUMBER / RANK / DENSE_RANK)・集計ウィンドウ
+  (SUM / COUNT / AVG / MIN / MAX … OVER。累積残高)・LAG / LEAD(前月比)。
+  `OVER(…)` と `AS 別名` は必須。**集計・GROUP BY と同じ SELECT には書けず、ウィンドウ結果を
+  同じ SELECT の式にも使えない**(CTE で段を分ける)。集計ウィンドウ・LAG / LEAD は
+  取得上限に達すると打ち切りではなくエラー
 - 取得上限・一時テーブル上限は最大 50,000(既定 10,000。`options.maxRecords` / `options.tempTableMaxRows`)
 
 ## このリポジトリのルール
