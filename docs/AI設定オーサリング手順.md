@@ -4,7 +4,7 @@
 ダッシュボード設定を「実アプリのデータを見ながら AI が書き、git で管理する」ための手順。
 
 - 最終更新: 2026-08-08
-- 対応: kSQL エンジン **3.62 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
+- 対応: kSQL エンジン **3.65 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
 - **改訂履歴は git を参照**(`git log --follow docs/AI設定オーサリング手順.md`)
 - 関連: [設定ファイル仕様](./設定ファイル仕様.md)(フォーマットの正本)/
   [ダッシュボードレシピ集](./ダッシュボードレシピ集.md)(SQL の書き方)
@@ -273,8 +273,11 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
     0 件ではなく kintone API エラーになる)
 - VALIDATE APP<番号>(入力規則違反の洗い出し。データ品質ペイン)
 - GENERATE_SERIES(start, stop [, step]) — WITH の CTE 本体にだけ書ける整数・日付系列。
-  取引の無い日を 0 で並べる日次推移は、系列を左辺にした LEFT JOIN で書く(レシピ D20)。
-  日付 step は '1 day' 形式(day のみ)、生成上限 10,000 行、取得ゼロ
+  取引の無い日・月を 0 で並べる推移は、系列を左辺にした LEFT JOIN で書く(レシピ D20)。
+  step は '1 day' / '1 month' / '1 year' 形式(月・年 step の start は月初・1 月 1 日限定)、
+  生成上限 10,000 行、取得ゼロ
+- CROSS JOIN — 明示の直積(日付系列 × マスタで「日付 × 製品」の格子 → 製品別 0 埋め。
+  レシピ D20)。直積も上限 10,000 行(WHERE / LIMIT で免除されない)。ON 1=1・カンマ結合は不可
 - ウィンドウ関数 — 順位系(ROW_NUMBER / RANK / DENSE_RANK)・集計ウィンドウ
   (SUM/COUNT/AVG/MIN/MAX … OVER。累積残高)・LAG / LEAD(前月比は月次集約 → LAG → 比率の 3 段)。
   OVER(…) と AS 別名は必須。集計・GROUP BY と同じ SELECT には書けない(CTE で分ける)。
@@ -306,7 +309,7 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 
 | 項目 | 内容 |
 | :--- | :--- |
-| MCP サーバー | `ksql-mcp` **3.62.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**(3.56.3〜)。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
+| MCP サーバー | `ksql-mcp` **3.65.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**(3.56.3〜)。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
 | ツール | 13 個 — `ksql_show_apps` / `ksql_describe_app` / `ksql_app_metadata` / `ksql_validate` / `ksql_explain` / `ksql_query` / `ksql_docs` / `ksql_mutate` / 保存クエリ 5 種 |
 | resources | `ksql://language-reference` / `ksql://recipes` |
 | 認証 | `KSQL_BASE_URL` +(`KSQL_TOKEN` または `KSQL_USERNAME`/`KSQL_PASSWORD`) |
