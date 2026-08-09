@@ -41,7 +41,7 @@
      "date": "<生成日時 YYYY-MM-DD HH:MM:SS>",
      "pluginName": "kSQL Dashboard Pro",
      "pluginVersion": "1",
-     "engineVersion": "3.65.0",           // node_modules の @rex0220/kintone-sql-tools の version
+     "engineVersion": "3.66.0",           // node_modules の @rex0220/kintone-sql-tools の version
      "appId": <対象アプリ番号>,
      "appName": "<対象アプリ名>",
      "sqlApps": [                          // SQL が参照する APP<番号> をすべて列挙(名前は ksql_show_apps から)
@@ -99,6 +99,11 @@
   月初・1 月 1 日限定)・生成上限 10,000 行・取得ゼロ)
 - **`CROSS JOIN`**(3.63.0〜)— 明示の直積。日付系列 × マスタで「日付 × 製品」の格子を作り
   製品別 0 埋め(レシピ D20)。直積も上限 10,000 行・完全入力必須。ON 1=1・カンマ結合は不可
+- **`WITH RECURSIVE` + 任意の `CYCLE` 句**(3.66.0〜)— 部品表・組織図など深さがデータ次第の
+  階層を展開(レシピ D21)。形は `seed UNION ALL 再帰項` の 2 枝・自己参照 1 回・INNER 等値
+  JOIN 1 本に限る(範囲外は実行前エラー)。**参照アプリは全件実体化**(WHERE が押し下がらない
+  ため、アプリ全体が取得上限に収まること)。深さ 100・累積 10,000 行・中間展開 100,000 の
+  三境界超過は部分結果なしのエラー。固定深さの階層なら自己 JOIN で足りる
 - ウィンドウ関数 — 順位系(ROW_NUMBER / RANK / DENSE_RANK)・集計ウィンドウ
   (SUM / COUNT / AVG / MIN / MAX … OVER。累積残高)・LAG / LEAD(前月比)。
   `OVER(…)` と `AS 別名` は必須。**集計・GROUP BY と同じ SELECT には書けず、ウィンドウ結果を
