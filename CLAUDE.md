@@ -41,7 +41,7 @@
      "date": "<生成日時 YYYY-MM-DD HH:MM:SS>",
      "pluginName": "kSQL Dashboard Pro",
      "pluginVersion": "1",
-     "engineVersion": "3.66.0",           // node_modules の @rex0220/kintone-sql-tools の version
+     "engineVersion": "3.66.1",           // node_modules の @rex0220/kintone-sql-tools の version
      "appId": <対象アプリ番号>,
      "appName": "<対象アプリ名>",
      "sqlApps": [                          // SQL が参照する APP<番号> をすべて列挙(名前は ksql_show_apps から)
