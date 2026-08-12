@@ -279,7 +279,7 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
   生成上限 10,000 行、取得ゼロ
 - CROSS JOIN — 明示の直積(日付系列 × マスタで「日付 × 製品」の格子 → 製品別 0 埋め。
   レシピ D5b)。直積も上限 10,000 行(WHERE / LIMIT で免除されない)。ON 1=1・カンマ結合は不可
-- WITH RECURSIVE(再帰 CTE。3.66.0〜)— 部品表・組織図など深さがデータ次第の階層を展開
+- WITH RECURSIVE(再帰 CTE)— 部品表・組織図など深さがデータ次第の階層を展開
   (レシピ D22)。seed UNION ALL 再帰項の 2 枝・自己参照 1 回・INNER 等値 JOIN 1 本に限る。
   参照アプリは全件実体化(WHERE が押し下がらないため、アプリ全体が取得上限に収まること)。
   深さ 100・累積 10,000 行・中間展開 100,000 の三境界超過は部分結果なしのエラー。
@@ -315,7 +315,7 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 
 | 項目 | 内容 |
 | :--- | :--- |
-| MCP サーバー | `ksql-mcp` **3.66.1**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**(3.56.3〜)。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
+| MCP サーバー | `ksql-mcp` **3.66.1**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
 | ツール | 13 個 — `ksql_show_apps` / `ksql_describe_app` / `ksql_app_metadata` / `ksql_validate` / `ksql_explain` / `ksql_query` / `ksql_docs` / `ksql_mutate` / 保存クエリ 5 種 |
 | resources | `ksql://language-reference` / `ksql://recipes` |
 | 認証 | `KSQL_BASE_URL` +(`KSQL_TOKEN` または `KSQL_USERNAME`/`KSQL_PASSWORD`) |
