@@ -40,8 +40,8 @@
    {
      "date": "<生成日時 YYYY-MM-DD HH:MM:SS>",
      "pluginName": "kSQL Dashboard Pro",
-     "pluginVersion": "1",
-     "engineVersion": "3.66.1",           // node_modules の @rex0220/kintone-sql-tools の version
+     "pluginVersion": "2",
+     "engineVersion": "3.85.0",           // node_modules の @rex0220/kintone-sql-tools の version
      "appId": <対象アプリ番号>,
      "appName": "<対象アプリ名>",
      "sqlApps": [                          // SQL が参照する APP<番号> をすべて列挙(名前は ksql_show_apps から)
@@ -107,9 +107,10 @@
   三境界超過は部分結果なしのエラー。固定深さの階層なら自己 JOIN で足りる
 - ウィンドウ関数 — 順位系(ROW_NUMBER / RANK / DENSE_RANK)・集計ウィンドウ
   (SUM / COUNT / AVG / MIN / MAX … OVER。累積残高)・LAG / LEAD(前月比)。
-  `OVER(…)` と `AS 別名` は必須。**集計・GROUP BY と同じ SELECT には書けず、ウィンドウ結果を
-  同じ SELECT の式にも使えない**(CTE で段を分ける)。集計ウィンドウ・LAG / LEAD は
-  取得上限に達すると打ち切りではなくエラー
+  `OVER(…)` と `AS 別名` は必須。**集計・GROUP BY と同じ SELECT に書け、ウィンドウ結果を
+  同じ SELECT の式にも使える**(順位・構成比・前月比が 1 段で書ける。レシピ D12 / D16)。
+  WHERE / HAVING からは参照できない(順位で絞るなら CTE で段を分ける)。
+  集計ウィンドウ・LAG / LEAD は取得上限に達すると打ち切りではなくエラー
 - 取得上限・一時テーブル上限は最大 50,000(既定 10,000。`options.maxRecords` / `options.tempTableMaxRows`)
 
 ## このリポジトリのルール

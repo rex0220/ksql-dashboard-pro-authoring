@@ -3,8 +3,8 @@
 **VSCode + Claude Code + kSQL MCP + 設定ファイル仕様**で、
 ダッシュボード設定を「実アプリのデータを見ながら AI が書き、git で管理する」ための手順。
 
-- 最終更新: 2026-08-12
-- 対応: kSQL エンジン **3.66 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
+- 最終更新: 2026-09-17
+- 対応: kSQL エンジン **3.85 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
 - **改訂履歴は git を参照**(`git log --follow docs/AI設定オーサリング手順.md`)
 - 関連: [設定ファイル仕様](./設定ファイル仕様.md)(フォーマットの正本)/
   [ダッシュボードレシピ集](./ダッシュボードレシピ集.md)(SQL の書き方)
@@ -285,9 +285,10 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
   深さ 100・累積 10,000 行・中間展開 100,000 の三境界超過は部分結果なしのエラー。
   循環しうるデータは CYCLE 句で経路単位に打ち切る。固定深さの階層なら自己 JOIN で足りる
 - ウィンドウ関数 — 順位系(ROW_NUMBER / RANK / DENSE_RANK)・集計ウィンドウ
-  (SUM/COUNT/AVG/MIN/MAX … OVER。累積残高)・LAG / LEAD(前月比は月次集約 → LAG → 比率の 3 段)。
-  OVER(…) と AS 別名は必須。集計・GROUP BY と同じ SELECT には書けない(CTE で分ける)。
-  集計ウィンドウ・LAG/LEAD は取得上限に達すると打ち切りではなくエラー
+  (SUM/COUNT/AVG/MIN/MAX … OVER。累積残高)・LAG / LEAD(前月比)。
+  OVER(…) と AS 別名は必須。集計・GROUP BY と同じ SELECT に書け、ウィンドウ結果を同じ SELECT の
+  式にも使える(順位・構成比・前月比が 1 段で書ける)。WHERE / HAVING からは参照できない
+  (順位で絞るなら CTE で分ける)。集計ウィンドウ・LAG/LEAD は取得上限に達すると打ち切りではなくエラー
 - 取得上限・一時テーブル上限は最大 50,000(既定 10,000。大きくするなら options.maxRecords /
   options.tempTableMaxRows)
 
@@ -315,7 +316,7 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 
 | 項目 | 内容 |
 | :--- | :--- |
-| MCP サーバー | `ksql-mcp` **3.66.1**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
+| MCP サーバー | `ksql-mcp` **3.85.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
 | ツール | 13 個 — `ksql_show_apps` / `ksql_describe_app` / `ksql_app_metadata` / `ksql_validate` / `ksql_explain` / `ksql_query` / `ksql_docs` / `ksql_mutate` / 保存クエリ 5 種 |
 | resources | `ksql://language-reference` / `ksql://recipes` |
 | 認証 | `KSQL_BASE_URL` +(`KSQL_TOKEN` または `KSQL_USERNAME`/`KSQL_PASSWORD`) |
