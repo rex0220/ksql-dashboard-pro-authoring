@@ -40,8 +40,8 @@
    {
      "date": "<生成日時 YYYY-MM-DD HH:MM:SS>",
      "pluginName": "kSQL Dashboard Pro",
-     "pluginVersion": "2",
-     "engineVersion": "3.85.0",           // node_modules の @rex0220/kintone-sql-tools の version
+     "pluginVersion": "3",
+     "engineVersion": "3.95.0",           // node_modules の @rex0220/kintone-sql-tools の version
      "appId": <対象アプリ番号>,
      "appName": "<対象アプリ名>",
      "sqlApps": [                          // SQL が参照する APP<番号> をすべて列挙(名前は ksql_show_apps から)
@@ -76,6 +76,8 @@
 - **集計を含む SELECT に、集計もグループ化もしていない列は書けない**(エラー)。
   `MIN()` / `MAX()` で包むか `GROUP BY` に足す(`ANY_VALUE()` は無い)
 - UNION は両辺の列数を揃える(不一致はエラー。足りない側へ `''` などを足す)
+- 文の `ORDER BY` に集計式(`ORDER BY SUM(金額) DESC`)は書けない(構文エラー)。SELECT で別名を付け、
+  その別名で並べる(ウィンドウの `OVER (ORDER BY SUM(x))` は書ける)
 - 値が 0 個のときの `MIN` / `MAX` は `0` ではなく空文字。0 件判定・除数ガードは `= ''` も見る
 - `SELECT *` は使わない(設定が列名を参照するため列を明示)
 - 期間の絞り込みは相対日付関数(THIS_MONTH() 等)。LEFT/RIGHT JOIN 内・アプリをまたぐ OR・
@@ -111,7 +113,9 @@
   同じ SELECT の式にも使える**(順位・構成比・前月比が 1 段で書ける。レシピ D12 / D16)。
   WHERE / HAVING からは参照できない(順位で絞るなら CTE で段を分ける)。
   集計ウィンドウ・LAG / LEAD は取得上限に達すると打ち切りではなくエラー
-- 取得上限・一時テーブル上限は最大 50,000(既定 10,000。`options.maxRecords` / `options.tempTableMaxRows`)
+- 取得上限・一時テーブル上限は最大 50,000(既定 10,000。`options.maxRecords` / `options.tempTableMaxRows`)。
+  一時テーブルの上限は**出来た表の行数**で数え、元のアプリから読む件数は取得上限で数える
+  (大きい明細を一時テーブルに入れるなら両方を上げる。集計して畳む表は読む件数が一時テーブルの上限を超えても作れる)
 
 ## このリポジトリのルール
 

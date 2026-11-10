@@ -8,15 +8,69 @@
     "view": {
       "name": "営業ダッシュボード",
       "layout": [
-        { "i": "pane1", "x": 0, "y": 0, "w": 14, "h": 3 },
-        { "i": "pane2", "x": 14, "y": 0, "w": 26, "h": 3 },
-        { "i": "pane3", "x": 40, "y": 0, "w": 20, "h": 3 },
-        { "i": "pane4", "x": 0, "y": 3, "w": 20, "h": 5 },
-        { "i": "pane5", "x": 20, "y": 3, "w": 20, "h": 5 },
-        { "i": "pane6", "x": 40, "y": 3, "w": 20, "h": 5 },
-        { "i": "pane7", "x": 0, "y": 8, "w": 30, "h": 5 },
-        { "i": "pane8", "x": 30, "y": 8, "w": 30, "h": 5 },
-        { "i": "pane9", "x": 0, "y": 13, "w": 60, "h": 6 }
+        {
+          "i": "pane1",
+          "x": 0,
+          "y": 0,
+          "w": 12,
+          "h": 3
+        },
+        {
+          "i": "pane2",
+          "x": 12,
+          "y": 0,
+          "w": 26,
+          "h": 3
+        },
+        {
+          "i": "pane3",
+          "x": 38,
+          "y": 0,
+          "w": 22,
+          "h": 3
+        },
+        {
+          "i": "pane4",
+          "x": 0,
+          "y": 3,
+          "w": 20,
+          "h": 5
+        },
+        {
+          "i": "pane5",
+          "x": 20,
+          "y": 3,
+          "w": 20,
+          "h": 5
+        },
+        {
+          "i": "pane6",
+          "x": 40,
+          "y": 3,
+          "w": 20,
+          "h": 5
+        },
+        {
+          "i": "pane7",
+          "x": 0,
+          "y": 8,
+          "w": 30,
+          "h": 5
+        },
+        {
+          "i": "pane8",
+          "x": 30,
+          "y": 8,
+          "w": 30,
+          "h": 5
+        },
+        {
+          "i": "pane9",
+          "x": 0,
+          "y": 13,
+          "w": 60,
+          "h": 6
+        }
       ],
       "panes": [
         {
@@ -27,10 +81,26 @@
           "options": {
             "fontSize": "xlarge",
             "goalBar": true,
-            "format": { "prefix": "¥", "thousandSep": true, "decimals": 0 },
+            "format": {
+              "scale": "man",
+              "thousandSep": true,
+              "decimals": 0
+            },
             "rules": [
-              { "target": "rate", "op": ">=", "value": 100, "tone": "good", "apply": "border" },
-              { "target": "rate", "op": "<", "value": 90, "tone": "warn", "apply": "border" }
+              {
+                "target": "rate",
+                "op": ">=",
+                "value": 100,
+                "tone": "good",
+                "apply": "border"
+              },
+              {
+                "target": "rate",
+                "op": "<",
+                "value": 90,
+                "tone": "warn",
+                "apply": "border"
+              }
             ]
           }
         },
@@ -42,16 +112,21 @@
           "options": {
             "multi": true,
             "maxTiles": 6,
-            "format": { "scale": "man", "decimals": 0, "thousandSep": true }
+            "align": "center",
+            "format": {
+              "scale": "man",
+              "decimals": 0,
+              "thousandSep": true
+            }
           }
         },
         {
           "id": "pane3",
           "type": "markdown",
-          "title": "サマリー",
-          "sql": "SELECT COUNT(*) AS 受注件数,\n       ROUND(SUM(売上) / 10000) AS 受注金額万\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
+          "title": "今期サマリー",
+          "sql": "SELECT COUNT(*) AS 受注件数,\n       ROUND(SUM(売上) / COUNT(*) / 10000) AS 平均万\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
           "options": {
-            "markdown": "### 今期サマリー\n\n- 受注 **{{受注件数}}** 件 / **{{受注金額万}}** 万円\n- 目標 5,000 万円に対する進捗は左の KPI カードを参照\n- <span style=\"color:#c0392b\">金額は税抜・受注フェーズのみ集計</span>",
+            "markdown": "- 受注 **{{受注件数}}** 件 / 平均 **{{平均万}}** 万円\n- 目標 5,000 万円に対する進捗は左の KPI カードを参照\n- <span style=\"color:#c0392b\">金額は税抜・受注フェーズのみ集計</span>",
             "fontSize": "normal"
           }
         },
@@ -62,7 +137,12 @@
           "sql": "SELECT 商談フェーズ,\n       COUNT(*) AS 件数\nFROM APP4149\nWHERE 商談フェーズ <> ''\nGROUP BY 商談フェーズ\nORDER BY 件数 DESC",
           "options": {
             "legend": "none",
-            "mapping": { "x": "商談フェーズ", "valueColumns": ["件数"] }
+            "mapping": {
+              "x": "商談フェーズ",
+              "valueColumns": [
+                "件数"
+              ]
+            }
           }
         },
         {
@@ -73,8 +153,15 @@
           "options": {
             "legend": "right",
             "topN": 8,
-            "mapping": { "x": "提案商品", "value": "売上" },
-            "valueFormat": { "scale": "man", "decimals": 0, "thousandSep": true }
+            "mapping": {
+              "x": "提案商品",
+              "value": "売上"
+            },
+            "valueFormat": {
+              "scale": "man",
+              "decimals": 0,
+              "thousandSep": true
+            }
           }
         },
         {
@@ -84,10 +171,20 @@
           "sql": "SELECT DATE_FORMAT(受注予定日, '%Y-%m') AS 年月,\n       SUM(売上) AS 売上,\n       COUNT(*)  AS 件数\nFROM APP4149\nWHERE 受注予定日 <> ''\nGROUP BY DATE_FORMAT(受注予定日, '%Y-%m')\nORDER BY 年月",
           "options": {
             "legend": "top",
-            "mapping": { "x": "年月" },
-            "bars": ["売上"],
-            "lines": ["件数"],
-            "valueFormat": { "scale": "man", "decimals": 0, "thousandSep": true }
+            "mapping": {
+              "x": "年月"
+            },
+            "bars": [
+              "売上"
+            ],
+            "lines": [
+              "件数"
+            ],
+            "valueFormat": {
+              "scale": "man",
+              "decimals": 0,
+              "thousandSep": true
+            }
           }
         },
         {
@@ -97,8 +194,17 @@
           "sql": "SELECT c.業種,\n       SUM(d.売上) AS 売上\nFROM APP4149 d\nJOIN APP4148 c ON d.顧客No_ = c.顧客No\nGROUP BY c.業種\nORDER BY 売上 DESC",
           "options": {
             "legend": "none",
-            "mapping": { "x": "業種", "valueColumns": ["売上"] },
-            "valueFormat": { "scale": "man", "decimals": 0, "thousandSep": true }
+            "mapping": {
+              "x": "業種",
+              "valueColumns": [
+                "売上"
+              ]
+            },
+            "valueFormat": {
+              "scale": "man",
+              "decimals": 0,
+              "thousandSep": true
+            }
           }
         },
         {
@@ -109,15 +215,34 @@
           "options": {
             "density": "compact",
             "columns": {
-              "ランク": { "width": 80, "align": "center" },
-              "件数": { "width": 90, "align": "right" },
+              "ランク": {
+                "width": 80,
+                "align": "center"
+              },
+              "件数": {
+                "width": 90,
+                "align": "right"
+              },
               "売上": {
                 "align": "right",
-                "format": { "kind": "number", "prefix": "¥", "thousandSep": true, "decimals": 0 }
+                "format": {
+                  "kind": "number",
+                  "thousandSep": true,
+                  "decimals": 0,
+                  "scale": "man"
+                }
               }
             },
-            "totals": { "件数": "sum", "売上": "sum" },
-            "rules": [{ "kind": "heatmap", "column": "売上" }]
+            "totals": {
+              "件数": "sum",
+              "売上": "sum"
+            },
+            "rules": [
+              {
+                "kind": "heatmap",
+                "column": "売上"
+              }
+            ]
           }
         },
         {
@@ -128,27 +253,67 @@
           "options": {
             "density": "compact",
             "columns": {
-              "$id": { "hidden": true },
-              "案件名": { "width": 300 },
-              "会社名": { "width": 240 },
-              "商談フェーズ": { "width": 110, "align": "center" },
-              "確度": { "width": 80, "align": "center" },
+              "$id": {
+                "hidden": true
+              },
+              "案件名": {
+                "width": 300
+              },
+              "会社名": {
+                "width": 240
+              },
+              "商談フェーズ": {
+                "width": 110,
+                "align": "center"
+              },
+              "確度": {
+                "width": 80,
+                "align": "center"
+              },
               "売上": {
                 "align": "right",
-                "format": { "kind": "number", "prefix": "¥", "thousandSep": true, "decimals": 0 }
+                "format": {
+                  "kind": "number",
+                  "thousandSep": true,
+                  "decimals": 0,
+                  "scale": "man"
+                }
               },
               "受注予定日": {
                 "width": 120,
                 "align": "center",
-                "format": { "kind": "date", "pattern": "YYYY/MM/DD" }
+                "format": {
+                  "kind": "date",
+                  "pattern": "YYYY/MM/DD"
+                }
               }
             },
-            "totals": { "売上": "sum" },
+            "totals": {
+              "売上": "sum"
+            },
             "rules": [
-              { "kind": "threshold", "column": "売上", "op": ">=", "value": 6000000, "tone": "good" },
-              { "kind": "threshold", "column": "商談フェーズ", "op": "=", "value": "内示", "tone": "warn", "scope": "row" }
+              {
+                "kind": "threshold",
+                "column": "売上",
+                "op": ">=",
+                "value": 6000000,
+                "tone": "good"
+              },
+              {
+                "kind": "threshold",
+                "column": "商談フェーズ",
+                "op": "=",
+                "value": "内示",
+                "tone": "warn",
+                "scope": "row"
+              }
             ],
-            "initialSort": [{ "column": "売上", "desc": true }]
+            "initialSort": [
+              {
+                "column": "売上",
+                "desc": true
+              }
+            ]
           }
         }
       ]
