@@ -3,8 +3,8 @@
 **VSCode + Claude Code + kSQL MCP + 設定ファイル仕様**で、
 ダッシュボード設定を「実アプリのデータを見ながら AI が書き、git で管理する」ための手順。
 
-- 最終更新: 2026-09-17
-- 対応: kSQL エンジン **3.85 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
+- 最終更新: 2026-11-10
+- 対応: kSQL エンジン **3.95 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
 - **改訂履歴は git を参照**(`git log --follow docs/AI設定オーサリング手順.md`)
 - 関連: [設定ファイル仕様](./設定ファイル仕様.md)(フォーマットの正本)/
   [ダッシュボードレシピ集](./ダッシュボードレシピ集.md)(SQL の書き方)
@@ -289,8 +289,13 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
   OVER(…) と AS 別名は必須。集計・GROUP BY と同じ SELECT に書け、ウィンドウ結果を同じ SELECT の
   式にも使える(順位・構成比・前月比が 1 段で書ける)。WHERE / HAVING からは参照できない
   (順位で絞るなら CTE で分ける)。集計ウィンドウ・LAG/LEAD は取得上限に達すると打ち切りではなくエラー
+- **kintone 標準のグラフ・表(レポート)の埋め込み** — 表示タイプ `report`(レシピ D23 / 設定ファイル仕様 §6.5)。
+  SQL は `""`、`options` に `app`(アプリ番号)・`report`(レポート ID)・`query`(グラフの指定)を書く。
+  レポート ID は利用者が kintone の埋め込み用タグ(タイトルなし推奨)から控える(AI は推測しない)。
+  高さは 6 行以上。変数コントロール・CSV は対象外
 - 取得上限・一時テーブル上限は最大 50,000(既定 10,000。大きくするなら options.maxRecords /
-  options.tempTableMaxRows)
+  options.tempTableMaxRows)。一時テーブルの上限は出来た表の行数で数え、元のアプリから読む件数は
+  取得上限で数える(大きい明細を一時テーブルに入れるなら両方を上げる)
 
 作りたい内容: <ここに要件>
 ```
@@ -316,7 +321,7 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 
 | 項目 | 内容 |
 | :--- | :--- |
-| MCP サーバー | `ksql-mcp` **3.85.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
+| MCP サーバー | `ksql-mcp` **3.95.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
 | ツール | 13 個 — `ksql_show_apps` / `ksql_describe_app` / `ksql_app_metadata` / `ksql_validate` / `ksql_explain` / `ksql_query` / `ksql_docs` / `ksql_mutate` / 保存クエリ 5 種 |
 | resources | `ksql://language-reference` / `ksql://recipes` |
 | 認証 | `KSQL_BASE_URL` +(`KSQL_TOKEN` または `KSQL_USERNAME`/`KSQL_PASSWORD`) |

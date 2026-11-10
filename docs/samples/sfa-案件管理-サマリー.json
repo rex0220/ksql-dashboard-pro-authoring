@@ -10,21 +10,21 @@
           "i": "pane1",
           "x": 0,
           "y": 0,
-          "w": 14,
+          "w": 12,
           "h": 3
         },
         {
           "i": "pane2",
-          "x": 14,
+          "x": 12,
           "y": 0,
           "w": 26,
           "h": 3
         },
         {
           "i": "pane3",
-          "x": 40,
+          "x": 38,
           "y": 0,
-          "w": 20,
+          "w": 22,
           "h": 3
         }
       ],
@@ -38,7 +38,7 @@
             "fontSize": "xlarge",
             "goalBar": true,
             "format": {
-              "prefix": "¥",
+              "scale": "man",
               "thousandSep": true,
               "decimals": 0
             },
@@ -72,16 +72,17 @@
               "scale": "man",
               "decimals": 0,
               "thousandSep": true
-            }
+            },
+            "align": "center"
           }
         },
         {
           "id": "pane3",
           "type": "markdown",
           "title": "今期サマリー(全社)",
-          "sql": "SELECT COUNT(*) AS 受注件数,\n       ROUND(SUM(売上) / 10000) AS 受注金額万\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
+          "sql": "SELECT COUNT(*) AS 受注件数,\n       ROUND(SUM(売上) / COUNT(*) / 10000) AS 平均万\nFROM APP4149\nWHERE 商談フェーズ = '受注'",
           "options": {
-            "markdown": "- 受注 **{{受注件数}}** 件 / **{{受注金額万}}** 万円\n- **全社の数字です**(一覧の絞り込みとは連動しません)",
+            "markdown": "- 受注 **{{受注件数}}** 件 / 平均 **{{平均万}}** 万円\n- **全社の数字です**(一覧の絞り込みとは連動しません)",
             "fontSize": "normal"
           }
         }
