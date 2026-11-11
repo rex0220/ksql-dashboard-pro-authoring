@@ -4,7 +4,7 @@
 ダッシュボード設定を「実アプリのデータを見ながら AI が書き、git で管理する」ための手順。
 
 - 最終更新: 2026-11-10
-- 対応: kSQL エンジン **3.95 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
+- 対応: kSQL エンジン **3.96 系** / [設定ファイル仕様](./設定ファイル仕様.md) **1.14**
 - **改訂履歴は git を参照**(`git log --follow docs/AI設定オーサリング手順.md`)
 - 関連: [設定ファイル仕様](./設定ファイル仕様.md)(フォーマットの正本)/
   [ダッシュボードレシピ集](./ダッシュボードレシピ集.md)(SQL の書き方)
@@ -321,7 +321,7 @@ kSQL MCP を使って、アプリ APP<番号> のダッシュボード設定を�
 
 | 項目 | 内容 |
 | :--- | :--- |
-| MCP サーバー | `ksql-mcp` **3.95.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
+| MCP サーバー | `ksql-mcp` **3.96.0**(エンジンパッケージ同梱。Node.js 20 以上)。接続時の instructions 1 行目に版数が出る。**`ksql_docs` を引数なしで呼ぶと稼働中の版数を返す**。エンジン更新後は MCP クライアントの再読み込みが必要(常駐プロセスは `npm install` では差し替わらない) |
 | ツール | 13 個 — `ksql_show_apps` / `ksql_describe_app` / `ksql_app_metadata` / `ksql_validate` / `ksql_explain` / `ksql_query` / `ksql_docs` / `ksql_mutate` / 保存クエリ 5 種 |
 | resources | `ksql://language-reference` / `ksql://recipes` |
 | 認証 | `KSQL_BASE_URL` +(`KSQL_TOKEN` または `KSQL_USERNAME`/`KSQL_PASSWORD`) |
